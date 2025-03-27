@@ -1,0 +1,101 @@
+Name,Text,Type,difficulty
+Task 1,The cat sat on the mat.,insertion ,1
+Task 2,She went to the store.,insertion ,1
+Task 3,I love eating apples.,insertion ,2
+Task 4,He sings beautifully.,insertion ,2
+Task 5,The dog barked loudly.,insertion ,2
+Task 6,We saw a rainbow today.,insertion ,3
+Task 7,They enjoy playing soccer.,insertion ,3
+Task 8,She reads a book every night.,insertion ,3
+Task 9,He always drinks coffee.,insertion ,3
+Task 10,The teacher gave homework.,insertion ,3
+Task 11,She danced in the rain.,insertion ,3
+Task 12,The baby laughed happily.,insertion ,3
+Task 13,He drove to work.,insertion ,2
+Task 14,The sun shines brightly.,insertion ,2
+Task 15,Birds fly in the sky.,insertion ,1
+Task 16,The clock ticks softly.,insertion ,3
+Task 17,My mother makes dinner.,insertion ,3
+Task 18,He wrote a letter.,insertion ,2
+Task 19,We visited the museum.,insertion ,4
+Task 20,The wind blows cold.,insertion ,3
+Task 21,She buys fresh fruit.,insertion ,3
+Task 22,The child hugged her mom.,insertion ,3
+Task 23,I found a shiny penny.,insertion ,3
+Task 24,He swims in the pool.,insertion ,3
+Task 25,She wore a red dress.,insertion ,2
+Task 26,The brown dog runs fast.,skipping ,2
+Task 27,He likes to paint.,skipping ,2
+Task 28,They travel to Europe.,skipping ,2
+Task 29,She eats a sandwich.,skipping ,3
+Task 30,He listens to music.,skipping ,3
+Task 31,The little girl sings.,skipping ,3
+Task 32,My dad fixes cars.,skipping ,3
+Task 33,The airplane takes off.,skipping ,3
+Task 34,The doorbell rang loudly.,skipping ,3
+Task 35,She carried a basket.,skipping ,3
+Task 36,We saw a shooting star.,skipping ,4
+Task 37,The waves crashed on shore.,skipping ,3
+Task 38,The train arrived late.,skipping ,4
+Task 39,He studies every day.,skipping ,4
+Task 40,The snow is melting.,skipping ,3
+Task 41,My aunt bakes cookies.,skipping ,2
+Task 42,The teacher smiled kindly.,skipping ,3
+Task 43,The leaves turned red.,skipping ,3
+Task 44,He opened the book.,skipping ,3
+Task 45,The flowers bloom in spring.,skipping ,3
+Task 46,She whispered a secret.,skipping ,4
+Task 47,The sun set slowly.,skipping ,1
+Task 48,The river flows gently.,skipping ,2
+Task 49,The candle flickered softly.,skipping ,4
+Task 50,We heard an owl hoot.,skipping ,2
+Task 51,The ball is round.,phoneme ,1
+Task 52,He eats toast for breakfast.,phoneme ,2
+Task 53,The stars twinkle at night.,phoneme ,3
+Task 54,She tied her shoelaces.,phoneme ,4
+Task 55,The monkey climbed the tree.,phoneme ,3
+Task 56,They built a sandcastle.,phoneme ,4
+Task 57,He picked fresh strawberries.,phoneme ,4
+Task 58,She sharpened her pencil.,phoneme ,4
+Task 59,The cat chased the mouse.,phoneme ,3
+Task 60,The dolphin jumped high.,phoneme ,3
+Task 61,I rode my bicycle.,phoneme ,3
+Task 62,He watched a funny movie.,phoneme ,3
+Task 63,She held a purple umbrella.,phoneme ,3
+Task 64,The baker made a cake.,phoneme ,2
+Task 65,The children played outside.,phoneme ,3
+Task 66,The squirrel found a nut.,phoneme ,5
+Task 67,The glass broke suddenly.,phoneme ,2
+Task 68,He drew a big circle.,phoneme ,3
+Task 69,The spider spun a web.,phoneme ,3
+Task 70,She waved goodbye.,phoneme ,2
+Task 71,The teacher read a story.,phoneme ,2
+Task 72,The butterfly landed gently.,phoneme ,3
+Task 73,The farmer milked the cow.,phoneme ,2
+Task 74,He counted to twenty.,phoneme ,3
+Task 75,The frog croaked loudly.,phoneme ,2
+Task 76,The theater was crowded.,accent ,2
+Task 77,He ordered a bottle of water.,accent ,3
+Task 78,She bought a new mirror.,accent ,4
+Task 79,The tomato was ripe.,accent ,3
+Task 80,I parked the car in the garage.,accent ,4
+Task 81,The alarm clock beeped.,accent ,2
+Task 82,He asked for directions.,accent ,3
+Task 83,The baby slept soundly.,accent ,1
+Task 84,The tourists took photos.,accent ,3
+Task 85,She knitted a sweater.,accent ,3
+Task 86,He turned off the faucet.,accent ,3
+Task 87,The waiter brought the check.,accent ,2
+Task 88,The library was quiet.,accent ,3
+Task 89,She enjoyed the yogurt.,accent ,3
+Task 90,The pasta was delicious.,accent ,2
+Task 91,He poured a glass of milk.,accent ,3
+Task 92,The taxi driver was friendly.,accent ,2
+Task 93,The orchestra played beautifully.,accent ,4
+Task 94,The dentist cleaned my teeth.,accent ,2
+Task 95,The puppy wagged its tail.,accent ,1
+Task 96,The weather was chilly.,accent ,2
+Task 97,She ironed her clothes.,accent ,4
+Task 98,He practiced the violin.,accent ,3
+Task 99,The doctor prescribed medicine.,accent ,2
+Task 100,The gardener watered the plants.,accent ,2

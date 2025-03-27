@@ -16,8 +16,8 @@ scores_keys_template = ["user_score_grammar", "user_score_listenning",
 
 
 class User():
-    def __init__(name:str=None, email:str=None, 
-    password:str=None, age:int=None, scores : dict=None):
+    def __init__(self, name:str=None, email:str=None, 
+    password:str=None, age:int=None, scores : dict=None, group_id:int=-1):
         user_uuid = str(uuid.uuid1())
         if name is None:
             warnings.warn("Name was unset")
@@ -31,7 +31,7 @@ class User():
         if age == None:
             age = random.randint(20, 60)
         if scores is None:
-            scores = dict(zip(scores_keys_template, 
+            scores = dict(zip(scores_keys_template.copy(), 
             generate_random_scores(scores_counter=len(scores_keys_template))))
 
         self.name = name
@@ -39,12 +39,13 @@ class User():
         self.password = password
         self.age = age
         self.scores = scores
+        self.group_id=-1
         
 
 task_types = {0 : "reading"}
 
 class Task():
-    def __init__(name:str, text:str, type:int, difficulty:int):
+    def __init__(self, name:str, text:str, type:int, difficulty:int):
         self.name = name
         self.text = text
         self.type = type

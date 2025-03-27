@@ -20,7 +20,7 @@ import psycopg2
 
 # далее в psql ебашим вот это (куда потом будем подключаться) CREATE DATABASE test_db;
 # то же самое для пользователя: CREATE USER testuser WITH ENCRYPTED PASSWORD 'testpassword';
-# и фигачим сюда все права GRANT ALL insert_any_user_queryPRIVILEGES ON DATABASE test_db TO testuser;
+# и фигачим сюда все права GRANT ALL PRIVILEGES ON DATABASE test_db TO testuser;
 
 # УПД БЛЕАТЬ
 # пришлось насвинячить ещё сильнее, выполнив:
@@ -34,39 +34,62 @@ import psycopg2
 # делать так ни в коем случае нельзя, но для демки которая только на локалхосте существует - съедобно
 
 
+# ну и раз уж тут туториалы пишем, для работы одной из штук в построении транкрипции нужна ffmpeg, поэтому не забываем
+# sudo apt install ffmpeg
+
+from dbController.queries import *
+
+from dbController.loadDefault import fill_tables_with_default_if_they_are_empty, create_default_tables
+
+MODE = "debug"
+
+class dbController():
+    def __init__(self):
+        self.connection = psycopg2.connect(
+            dbname="test_db",
+            user="testuser",
+            password="testpassword",
+            host="localhost"
+        )
+        self.cursor = self.connection.cursor()
+        create_default_tables(self.cursor)
+        fill_tables_with_default_if_they_are_empty(self.cursor)
+
+        # self.cursor.execute("""
+        #         SELECT table_name FROM information_schema.tables
+        #         WHERE table_schema = 'public'
+        #     """)
+
+
+        # tables = self.cursor.fetchall()
+        # print("Tables in the database:")
 
 
 
-conn = psycopg2.connect(
-    dbname="test_db",
-    user="testuser",
-    password="testpassword",
-    host="localhost"
-)
+        # for table in tables:
+        #     print(table[0])
 
+    def get_user(self, email):
+        self.cursor.execute(select_user_by_email, (email, ))
+        data = self.cursor.fetchall()[0]
+        # print("user data : ", data)
+        user = {
+            "name" : data[1],
+            "email" : data[2],
+            "password" : data[3]
+            }
+        return user
+    def get_task_for_user(self, email):
+        self.cursor.execute(select_all_tasks_of_current_user, (email, ))
+        return [{
+                "key": task[0],
+                "name": task[1],
+                "text": task[2],
+                "difficulty": task[4]}
+                    for task in self.cursor.fetchall()]
 
+    def on_shutdown(self):
 
-# WHERE NOT EXISTS (SELECT 1 FROM students)S
-
-cursor = conn.cursor()
-
-# to init only
-
-
-cursor.execute("""
-        SELECT table_name FROM information_schema.tables
-        WHERE table_schema = 'public'
-    """)
-
-
-tables = cursor.fetchall()
-print("Tables in the database:")
-
-
-
-for table in tables:
-    print(table[0])
-
-# Close the connection
-cursor.close()
-conn.close()
+        # Close the connection
+        self.cursor.close()
+        self.connection.close()
