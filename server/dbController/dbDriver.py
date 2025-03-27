@@ -34,109 +34,62 @@ import psycopg2
 # делать так ни в коем случае нельзя, но для демки которая только на локалхосте существует - съедобно
 
 
+# ну и раз уж тут туториалы пишем, для работы одной из штук в построении транкрипции нужна ffmpeg, поэтому не забываем
+# sudo apt install ffmpeg
+
+from dbController.queries import *
+
+from dbController.loadDefault import fill_tables_with_default_if_they_are_empty, create_default_tables
+
+MODE = "debug"
+
+class dbController():
+    def __init__(self):
+        self.connection = psycopg2.connect(
+            dbname="test_db",
+            user="testuser",
+            password="testpassword",
+            host="localhost"
+        )
+        self.cursor = self.connection.cursor()
+        create_default_tables(self.cursor)
+        fill_tables_with_default_if_they_are_empty(self.cursor)
+
+        # self.cursor.execute("""
+        #         SELECT table_name FROM information_schema.tables
+        #         WHERE table_schema = 'public'
+        #     """)
+
+
+        # tables = self.cursor.fetchall()
+        # print("Tables in the database:")
 
 
 
-conn = psycopg2.connect(
-    dbname="test_db",
-    user="testuser",
-    password="testpassword",
-    host="localhost"
-)
+        # for table in tables:
+        #     print(table[0])
 
+    def get_user(self, email):
+        self.cursor.execute(select_user_by_email, (email, ))
+        data = self.cursor.fetchall()[0]
+        # print("user data : ", data)
+        user = {
+            "name" : data[1],
+            "email" : data[2],
+            "password" : data[3]
+            }
+        return user
+    def get_task_for_user(self, email):
+        self.cursor.execute(select_all_tasks_of_current_user, (email, ))
+        return [{
+                "key": task[0],
+                "name": task[1],
+                "text": task[2],
+                "difficulty": task[4]}
+                    for task in self.cursor.fetchall()]
 
-create_users_table_query = """
-    CREATE TABLE IF NOT EXISTS students (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(150) UNIQUE NOT NULL,
-        password VARCHAR(100) NOT NULL,
-        age INTEGER,
-        user_score_grammar INTEGER,
-        user_score_listenning INTEGER,
-        user_score_reading_insertion INTEGER,
-        user_score_reading_skipping INTEGER,
-        user_score_reading_phoneme INTEGER,
-        user_score_reading_accent INTEGER,
-        user_group_id INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """
+    def on_shutdown(self):
 
-create_reading_tasks_table_query = """
-    CREATE TABLE IF NOT EXISTS reading_tasks (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        text VARCHAR(100) NOT NULL,
-        type INTEGER,
-        difficulty INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """
-
-create_users_tasks_table_query = """
-    CREATE TABLE students_tasks (
-        students_id INT REFERENCES students(id) ON DELETE CASCADE,
-        task_id INT REFERENCES reading_tasks(id) ON DELETE CASCADE,
-        enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (students_id, task_id)
-    );
-    """
-
-select_all_tasks_of_current_user = """
-    SELECT task.id, task.name, task.text
-    FROM students_tasks
-    JOIN students ON students_tasks.students_id = students.id
-    JOIN tasks ON users_tasks.course_id = tasks.id
-    WHERE students.email = 'test@test.com';
-"""
-
-select_user_by_email = """
-    SELECT students.id, students.email, students.password
-    FROM students
-    WHERE students.email = 'test@test.com';
-"""
-
-insert_any_user_query = """
-    INSERT INTO students (name,\
-         email,\
-         password,\
-         age,\
-         user_score_grammar,\
-         user_score_listenning,\
-         user_score_reading_insertion,\
-         user_score_reading_skipping,\
-         user_score_reading_phoneme,\
-         user_score_reading_accent,\
-         user_group_id) 
-    SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s 
-    WHERE NOT EXISTS (SELECT 1 FROM students);
-    """
-# WHERE NOT EXISTS (SELECT 1 FROM students)S
-
-cursor = conn.cursor()
-
-# to init only
-cursor.execute(create_users_table_query)
-cursor.execute(create_reading_tasks_table_query)
-cursor.execute(create_users_tasks_table_query)
-cursor.execute(insert_any_user_query, ("Andrew", "test@test.com", "test", 20, 70, 80, 70, 70, 70, 70, 0))
-
-
-cursor.execute("""
-        SELECT table_name FROM information_schema.tables
-        WHERE table_schema = 'public'
-    """)
-
-
-tables = cursor.fetchall()
-print("Tables in the database:")
-
-
-
-for table in tables:
-    print(table[0])
-
-# Close the connection
-cursor.close()
-conn.close()
+        # Close the connection
+        self.cursor.close()
+        self.connection.close()

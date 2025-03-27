@@ -1,4 +1,4 @@
-from apiRouter.router import run
+from apiRouter.router import app
 
 if __name__ == "__main__":
-    run()
+    app.

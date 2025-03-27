@@ -18,6 +18,7 @@ import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 // const MicrophoneStream = require('microphone-stream').default;
 import { useAudioRecorder, RecordingOptions, AudioModule, RecordingPresets } from 'expo-audio';
 import { useState, useEffect } from 'react';
+import { ColorSpace } from 'react-native-reanimated';
 
 
 export default function HomeScreen() {
@@ -29,7 +30,7 @@ export default function HomeScreen() {
   if (access_token == null){access_token = ""}
   console.log("access_token", access_token)
   
-
+  let [record_button_switcher, set_record_button_switcher]= useState(false);
   // блять я надеюсь это никто не увидит
   let wsForAudio = new WebSocket('ws://localhost:8000/voiceStream/')
 
@@ -48,16 +49,83 @@ export default function HomeScreen() {
       ))
 
   
-  let current_task = {
-    key: "task_1",
-    name: "Task 1. Very interestig question",
+  let [current_task, set_current_task] = useState({
+    key: "task_placeholder",
+    name: "Task 1. Task placeholder name",
     text: "Read the sentence below: \n what I'm wasting my life on...",
     difficulty: 5
-  }
+  })
 
+  let [colorised_text_view, set_colorised_text_view] = useState();
+  let [list_of_errors, set_list_of_errors] = useState([]);
+  let [is_done, set_is_done] = useState(false);
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+        const response = await fetch("http://localhost:8000/currentTask",
+          {
+            method: 'get', 
+            headers: new Headers({
+                'Authorization': 'Bearer ' + localStorage.getItem("access_token"), 
+                'Content-Type': 'application/x-www-form-urlencoded'
+            })});
+        // console.log("response ^ ", response);
+        if (response.ok) {
+          const result = await response.json();
+          set_current_task(result);
+        }
+        
+        // console.log(result.status)
+        // 
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    } finally {
+        setLoading(false);
+    }
+};
+  useEffect(() => {
+    fetchData();
+}, []);
 
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  
+  async function sendFileFromBlob(blobUri : string, uploadUrl:string) {
+    try {
+        // Fetch the blob data from the URI
+        const response = await fetch(blobUri);
+        const blob = await response.blob();
+        console.log(blob)
+        // Create a File from the Blob (if needed, adjust the filename and MIME type)
+        const file = new File([blob], "sentence.webm", { type: blob.type });
 
+        // Create FormData and append the file
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Send the file via POST request
+        const uploadResponse = await fetch(uploadUrl, {
+            method: "POST",
+            body: formData,
+            headers: new Headers({
+              'Authorization': 'Bearer ' + localStorage.getItem("access_token"),
+          })
+        });
+
+        // Handle the response
+        const result = await uploadResponse.json();
+        console.log("failed", result)
+        console.log("Upload success:", result);
+        set_list_of_errors(result.res);
+        set_is_done(true);
+        console.log(list_of_errors);
+    } catch (error) {
+        console.error("Error uploading file:", error);
+    }
+  }
   const record = async () => {
     await audioRecorder.prepareToRecordAsync();
     audioRecorder.record();
@@ -65,20 +133,12 @@ export default function HomeScreen() {
 
   const stopRecording = async () => {
     // The recording will be available on `audioRecorder.uri`.
-    console.log("uri = ", audioRecorder.uri)
+    console.log("uri = ", audioRecorder.uri);
 
     await audioRecorder.stop();
-    console.log("uri = ", audioRecorder.uri)
-    var data = new FormData()
-    data.append('file', input.files[0])
-    fetch('http://localhost:8000/hello',
-      {method: 'post', 
-        headers: new Headers({
-            'Authorization': 'Bearer ' + localStorage.getItem("access_token"), 
-            'Content-Type': 'application/x-www-form-urlencoded'
-        })
-        body}
-    )
+    console.log("uri = ", audioRecorder.uri);
+    
+    sendFileFromBlob( audioRecorder.uri  !== null ? audioRecorder.uri : "", "http://localhost:8000/getAudio");
   };
 
   useEffect(() => {
@@ -112,8 +172,11 @@ export default function HomeScreen() {
 
       </ThemedView>
       <ThemedView>
-        <ThemedText >Difficulty : {current_task.difficulty}</ThemedText>
-        <ThemedText style={{marginBottom: 15}}>{current_task.text}</ThemedText>
+        {/* <ThemedText >Difficulty : {current_task.difficulty}</ThemedText> */}
+        <ThemedText style={{marginBottom: 30}}>{current_task.text.split(" ").map((word : any, index)  => 
+                                // <ThemedText key={index}>{word} </ThemedText>
+                                <Text key={index} style={{color: list_of_errors.includes(index) ? "red" : "black"}}>{word} </Text>
+                              )}</ThemedText>
       </ThemedView>
 
       <SafeAreaProvider>
@@ -127,26 +190,26 @@ export default function HomeScreen() {
     }}>
       
         <Button
-          // border-radius="30"
-          title="Hold to speak"
-          // onPress={() => Alert.alert('Simple Button pressed')}
-          onPress={() => {record(); console.log('audio with websockets')}}
-          // onPress={() => {ws.send(new TextEncoder().encode("Hello")); console.log('audio with websockets')}}
+          title={record_button_switcher ? "Stop recording" : "Press and speak"}
+          onPress={() => {if (record_button_switcher)
+                           {set_record_button_switcher(false); stopRecording(); console.log('stop audio')}
+                          else
+                           {set_record_button_switcher(true); record(); console.log('audio with websockets');}}}
         />
-        <Button
-          // border-radius="30"
-          title="stop"
-          color="red"
-          // onPress={() => Alert.alert('Simple Button pressed')}
-          onPress={() => {stopRecording(); console.log('stop audio')}}
-          // onPress={() => {ws.send(new TextEncoder().encode("Hello")); console.log('audio with websockets')}}
-        />
-        {/* <Button
-          title={audioRecorder.isRecording ? 'Stop Recording' : 'Start Recording'}
-          onPress={audioRecorder.isRecording ? stopRecording : record}
-        /> */}
+        
       </View>
-      
+      {is_done ? <View style={{
+        width:"100%",
+        marginTop: 20, 
+        borderRadius: 8, 
+        overflow: 'hidden',
+        maxWidth: 500,
+      }}>
+        <Button
+            title="Next task"
+            onPress={() => {fetchData(); set_list_of_errors([]); set_is_done(false);}}
+          />
+        </View>: ""}
       {/* <TouchableOpacity onPress={() => console.log('Button 2 pressed')
         // setIsCollapsed(false)
       } >

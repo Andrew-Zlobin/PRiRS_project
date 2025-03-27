@@ -8,7 +8,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { router , Redirect} from 'expo-router';
-import { useState} from 'react';
+import { useEffect, useState} from 'react';
 
 
 export default function AllTasksScreen() {
@@ -35,31 +35,41 @@ export default function AllTasksScreen() {
       </Collapsible>
     ))
 
+    const [loadingTasks, setLoadingTasks] = useState(false);
+    
+      const fetchData = async () => {
+        setLoadingTasks(true);
+        try {
+            const response = await fetch("http://localhost:8000/allTasks",
+              {
+                method: 'get', 
+                headers: new Headers({
+                    'Authorization': 'Bearer ' + localStorage.getItem("access_token"), 
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                })});
+    
+            const result = await response.json();
+            tasks = result
+            console.log(result)
+            setTasksList(tasks.map((task : any)  => 
+                        <Collapsible key={task.key} title={task.name}>
+                          <ThemedText>
+                            Task difficulty : {task.difficulty}
+                          </ThemedText>
+                          <ThemedText type="defaultSemiBold">{task.text}</ThemedText>
+                  
+                        </Collapsible>
+                      ))
 
-  // fetch('http://localhost:8000/allTasks',
-  //       {method: 'get', 
-  //         headers: new Headers({
-  //             'Authorization': 'Bearer ' + localStorage.getItem("access_token"), 
-  //             'Content-Type': 'application/x-www-form-urlencoded'
-  //         })}
-  //     ).then(res => res.json()).then(((res) => {
-        
-  //         // console.log("tasks response", new TextDecoder().decode(res.body))
-  //         // console.log("Pizdec bl'at'", res)
-  //         // setTasks({ value: res, error: '' })
-  //         tasks = res
-  //         setTasksList(tasks.map((task : any)  => 
-  //           <Collapsible key={task.key} title={task.name}>
-  //             <ThemedText>
-  //               Task difficulty : {task.difficulty}
-  //             </ThemedText>
-  //             <ThemedText type="defaultSemiBold">{task.text}</ThemedText>
-      
-  //           </Collapsible>
-  //         ))
-        
-  
-  //     }))
+          } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+          setLoadingTasks(false);
+        }
+    };
+      useEffect(() => {
+        fetchData();
+    }, []);
 
   
 
