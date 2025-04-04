@@ -57,6 +57,21 @@ select_user_by_email = """
     WHERE students.email = %s;
 """
 
+select_all_tasks_ids_class_difficulty = """
+    select reading_tasks.id, reading_tasks.type, reading_tasks.difficulty
+    from reading_tasks
+"""
+
+select_all_tasks = """
+    select *
+    from reading_tasks
+"""
+
+select_all_users = """
+    SELECT *
+    FROM students;
+"""
+
 insert_any_user_query = """
     INSERT INTO students (name,\
          email,\
@@ -115,4 +130,19 @@ set_task_to_user = """
 
 detach_task_from_user = """
     DELETE FROM students_tasks WHERE students_id = %s AND task_id = %s
+"""
+
+detach_task_from_user_by_email = """
+    DELETE FROM students_tasks
+    WHERE students_id = (
+        SELECT id FROM students WHERE email = 'student@example.com'
+    )
+    AND task_id = 123;
+"""
+
+detach_all_tasks_from_user_by_email = """
+    DELETE FROM students_tasks
+    WHERE students_id = (
+        SELECT id FROM students WHERE email = %s
+    );
 """

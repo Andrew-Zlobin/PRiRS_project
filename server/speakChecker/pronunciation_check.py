@@ -18,7 +18,7 @@ def compare_phonemes(reference: str, checked: str):
     # checked_words = list(checked)
 
     matcher = SequenceMatcher(None, ref_words, checked_words)
-    print(matcher.get_opcodes())
+    # print(matcher.get_opcodes())
     differences = []
     expected_words_with_errors = []
     recived_words_with_errors = []

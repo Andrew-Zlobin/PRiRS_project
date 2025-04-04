@@ -23,6 +23,7 @@ from passlib.context import CryptContext
 from dbController.dbDriver import dbController
 
 from speakChecker.pronunciation_check import PronunciationModel
+from recommendationSystem.pipeline import recommendationModel
 
 SECRET = '6a824282e5030a2d2c4059d0c096a820e22d8e2898036434'
 manager = LoginManager(SECRET, token_url='/auth/token')
@@ -34,6 +35,7 @@ context_instances = {}
 async def lifespan(app: FastAPI):
     context_instances["database"] = dbController()
     context_instances["pronunciationModel"] = PronunciationModel()
+    context_instances["recommendationModel"] = recommendationModel(context_instances["database"])
     yield
     context_instances["database"].on_shutdown()
 
@@ -163,6 +165,7 @@ async def getAudio(file: UploadFile = File(...), user=Depends(manager)):
         current_task = context_instances["database"].get_task_for_user(user["email"])[0]
         print("try to process audio")
         res = context_instances["pronunciationModel"].evaluate_task(current_task["text"], contents)
+        context_instances["recommendationModel"].evaluate_errors(res)
         return JSONResponse(content={"status": "checked", "res": res["indexes_of_errors"]}, status_code=200)
     
     except Exception as e:
