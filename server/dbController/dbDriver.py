@@ -44,12 +44,13 @@ from dbController.loadDefault import fill_tables_with_default_if_they_are_empty,
 MODE = "debug"
 
 class dbController():
-    def __init__(self, path_to_default_tasks="../tasks_sample.csv"):
+    def __init__(self, path_to_default_tasks="tasks_sample.csv"):
         self.connection = psycopg2.connect(
-            dbname="test_db",
-            user="testuser",
-            password="testpassword",
-            host="localhost"
+            dbname="app_db",#"test_db",
+            user="postgres",#"testuser",
+            password="postgres",#"testpassword",
+            host="db",
+            port="5432"
         )
         self.cursor = self.connection.cursor()
         self.passed_ids = []
@@ -109,11 +110,18 @@ class dbController():
 
     def close_task_for_user(self, user_id, task_id):
         self.cursor.execute(detach_task_from_user, (user_id, task_id, ))
-        if user_id == 1:
-#             DELETE FROM reading_tasks
-# WHERE id = 123;
-            self.cursor.execute("DELETE FROM reading_tasks WHERE id = %s;", (task_id, ))
-
+        # this was quick bug fix to not getting similar tasks every time
+        # if user_id == 1:
+        #     self.cursor.execute("DELETE FROM reading_tasks WHERE id = %s;", (task_id, ))
+    def set_task_passed_by_user(self, user_id, task_id, result):
+        print((user_id, task_id, result, ))
+        self.cursor.execute(set_task_to_users_passed_tasks_query, (user_id, task_id, result, ))
+        
+    def check_if_task_is_passed_by_user(self, user_id, task_id):
+        self.cursor.execute(check_if_task_is_passed_by_user, (user_id, task_id))
+        cursor_output = self.cursor.fetchone()
+        return cursor_output[0] if cursor_output else False
+    
     def close_all_tasks_for_user_by_email(self, email):
         self.cursor.execute(detach_all_tasks_from_user_by_email, (email,))
 

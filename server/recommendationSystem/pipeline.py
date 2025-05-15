@@ -155,19 +155,25 @@ class recommendationModel:
                     if user["id"] == 1:
                         stats_test_parameter = mean_score
                     for task in sorted_tasks[cluster]:
-                        self.database.set_task_to_user(user["id"], task[0])
+                        if not self.database.check_if_task_is_passed_by_user(user["id"], task[0]):
+                            self.database.set_task_to_user(user["id"], task[0])
         return stats_test_parameter
         
-    def evaluate_errors(self, comparation_res):
-        user = self.database.get_user("test@test.com")
-
-        current_task = self.database.get_task_for_user(email="test@test.com")[0]
-        # print("comparation res = ", comparation_res)
-        # print("task = ", current_task)
+    def evaluate_errors(self, user, comparation_res):
+        # user = self.database.get_user("test@test.com")
+        print("evaluatin starts")
+        current_task = self.database.get_task_for_user(email=user['email'])[0]
+        print("comparation res = ", comparation_res)
+        print("task = ", current_task)
         self.database.close_task_for_user(user["id"], current_task["key"])
+        print("try to set passed task")
+        self.database.set_task_passed_by_user(user["id"], current_task["key"], 1)
+        print("successfully set passed task")
         self.update_score_for_user(user, current_task["text"], comparation_res)
+        
         mean_scores = self.proccess()
         user = self.database.get_user("test@test.com")
+        print("updated user : ", user)
 
 
 objects = [

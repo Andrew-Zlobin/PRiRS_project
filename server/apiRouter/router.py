@@ -152,7 +152,7 @@ async def getCurrentTask(user=Depends(manager)):
 
 @app.post("/getAudio")
 async def getAudio(file: UploadFile = File(...), user=Depends(manager)):
-    # print(data)
+    print("user from get audio", user)
     try:
         # Read file contents (optional)
         contents = await file.read()
@@ -161,11 +161,11 @@ async def getAudio(file: UploadFile = File(...), user=Depends(manager)):
         # file_location = f"{file.filename}"
         # with open(file_location, "wb+") as f:
         #     f.write(contents)
-
+        print('user["email"] = ', user["email"])
         current_task = context_instances["database"].get_task_for_user(user["email"])[0]
         print("try to process audio")
         res = context_instances["pronunciationModel"].evaluate_task(current_task["text"], contents)
-        context_instances["recommendationModel"].evaluate_errors(res)
+        context_instances["recommendationModel"].evaluate_errors(user, res)
         return JSONResponse(content={"status": "checked", "res": res["indexes_of_errors"]}, status_code=200)
     
     except Exception as e:

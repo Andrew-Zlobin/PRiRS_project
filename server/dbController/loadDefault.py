@@ -7,6 +7,7 @@ def create_default_tables(cursor):
     cursor.execute(create_users_table_query)
     cursor.execute(create_reading_tasks_table_query)
     cursor.execute(create_users_tasks_table_query)
+    cursor.execute(create_users_passed_tasks_table_query)
     # cursor.execute(insert_any_user_query, ("Andrew", "test@test.com", "test", 20, 70, 80, 70, 70, 70, 70, 0))
 
 def fill_tables_with_default_if_they_are_empty(cursor, path_to_tasks):

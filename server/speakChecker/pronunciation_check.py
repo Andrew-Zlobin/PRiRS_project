@@ -68,7 +68,12 @@ class PronunciationModel:
         predicted_ids = torch.argmax(logits, dim=-1)
         transcription = self.processor.batch_decode(predicted_ids)[0]
         print("processed transcription" , transcription)
-        phoneme_transcription = phonemize(transcription, language="en-us", backend="espeak")
+        # phoneme_transcription = phonemize(transcription, language="en-us", backend="espeak")
+        try:
+            phoneme_transcription = phonemize(transcription, language="en-us", backend="espeak")
+        except Exception as e:
+            print("error while phonemizing : ", e)
+            phoneme_transcription = ""
         return phoneme_transcription
 
     def evaluate_task(self, correct_sentence, recived_audio):
@@ -87,7 +92,10 @@ class PronunciationModel:
         print("try to get transcribtion")
 
         user_phoneme = self.get_transcribtion(waveform)
-        correct_phoneme = phonemize(correct_sentence, language="en-us", backend="espeak")
+        try:
+            correct_phoneme = phonemize(correct_sentence, language="en-us", backend="espeak")
+        except:
+            correct_phoneme = ""
         print("user Transcription:", user_phoneme)
         print("correct text: ", correct_sentence)
         print("correct text: ", correct_phoneme)
