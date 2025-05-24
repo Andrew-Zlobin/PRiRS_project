@@ -7,13 +7,14 @@ def create_default_tables(cursor):
     cursor.execute(create_users_table_query)
     cursor.execute(create_reading_tasks_table_query)
     cursor.execute(create_users_tasks_table_query)
+    cursor.execute(create_users_passed_tasks_table_query)
     # cursor.execute(insert_any_user_query, ("Andrew", "test@test.com", "test", 20, 70, 80, 70, 70, 70, 70, 0))
 
-def fill_tables_with_default_if_they_are_empty(cursor):
+def fill_tables_with_default_if_they_are_empty(cursor, path_to_tasks):
     cursor.execute(count_tasks_query)
     users_counter = cursor.fetchone()[0]
     if users_counter < 90:
-        cursor.execute(insert_any_user_query, ("Andrew", "test@test.com", "test", 20, 70, 80, 70, 70, 70, 70, 0))
+        cursor.execute(insert_any_user_query, ("Andrew", "test@test.com", "test", 20, 70, 60, 50, 40, 40, 40, 0))
         for _ in range(100):
             new_user = User()
             
@@ -33,9 +34,9 @@ def fill_tables_with_default_if_they_are_empty(cursor):
     cursor.execute(count_tasks_query)
     tasks_counter = cursor.fetchone()[0]
     if tasks_counter < 90:
-        tasks = pd.read_csv("../tasks_sample.csv")
+        tasks = pd.read_csv(path_to_tasks)
         tasks_to_insert = [(row["Name"], row["Text"], row["Type"], row["difficulty"]) for index, row in tasks.iterrows()]
-        print(tasks_to_insert[:5])
+        # print(tasks_to_insert[:5])
         cursor.executemany(insert_task_query, tasks_to_insert)
     
     cursor.execute(count_users_tasks_query)
@@ -59,4 +60,4 @@ def fill_tables_with_default_if_they_are_empty(cursor):
 #     JOIN students s ON st.students_id = s.id
 #     WHERE s.email = %s
 # """, ('example@email.com',))
-    print(cursor.fetchall())
+    # print(cursor.fetchall())

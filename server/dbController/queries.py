@@ -35,6 +35,17 @@ create_users_tasks_table_query = """
         PRIMARY KEY (students_id, task_id)
     );
     """
+
+create_users_passed_tasks_table_query = """
+    CREATE TABLE students_passed_tasks (
+        students_id INT REFERENCES students(id) ON DELETE CASCADE,
+        task_id INT REFERENCES reading_tasks(id) ON DELETE CASCADE,
+        success INTEGER,
+        enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (students_id, task_id)
+    );
+    """
+
 select_all_tasks_of_current_user = """
     SELECT rt.* 
     FROM reading_tasks rt
@@ -55,6 +66,21 @@ select_user_by_email = """
     SELECT *
     FROM students
     WHERE students.email = %s;
+"""
+
+select_all_tasks_ids_class_difficulty = """
+    select reading_tasks.id, reading_tasks.type, reading_tasks.difficulty
+    from reading_tasks
+"""
+
+select_all_tasks = """
+    select *
+    from reading_tasks
+"""
+
+select_all_users = """
+    SELECT *
+    FROM students;
 """
 
 insert_any_user_query = """
@@ -113,6 +139,35 @@ set_task_to_user = """
     ON CONFLICT (students_id, task_id) DO NOTHING;
 """
 
+set_task_to_users_passed_tasks_query = """
+    INSERT INTO students_passed_tasks (students_id, task_id, success) 
+    VALUES (%s, %s, %s) 
+    ON CONFLICT (students_id, task_id) DO NOTHING; 
+"""
+
+check_if_task_is_passed_by_user = """
+   SELECT EXISTS (
+                SELECT 1
+                FROM students_passed_tasks
+                WHERE students_id = %s AND task_id = %s
+            );
+"""
+
 detach_task_from_user = """
     DELETE FROM students_tasks WHERE students_id = %s AND task_id = %s
+"""
+
+detach_task_from_user_by_email = """
+    DELETE FROM students_tasks
+    WHERE students_id = (
+        SELECT id FROM students WHERE email = 'student@example.com'
+    )
+    AND task_id = 123;
+"""
+
+detach_all_tasks_from_user_by_email = """
+    DELETE FROM students_tasks
+    WHERE students_id = (
+        SELECT id FROM students WHERE email = %s
+    );
 """

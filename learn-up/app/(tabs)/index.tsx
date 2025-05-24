@@ -32,7 +32,7 @@ export default function HomeScreen() {
   
   let [record_button_switcher, set_record_button_switcher]= useState(false);
   // блять я надеюсь это никто не увидит
-  let wsForAudio = new WebSocket('ws://localhost:8000/voiceStream/')
+  // let wsForAudio = new WebSocket('ws://localhost:8000/voiceStream/')
 
   fetch('http://localhost:8000/hello',
         {method: 'get', 
@@ -44,7 +44,7 @@ export default function HomeScreen() {
         // if (res.status === 401) {
           console.log("try to connect to ", res)
 
-          wsForAudio = new WebSocket('ws://localhost:8000/voiceStream/' + res); // , ["access_token", access_token]
+          // wsForAudio = new WebSocket('ws://localhost:8000/voiceStream/' + res); // , ["access_token", access_token]
         }
       ))
 

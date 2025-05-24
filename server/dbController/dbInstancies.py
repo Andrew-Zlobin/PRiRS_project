@@ -5,8 +5,8 @@ from math import trunc
 import warnings
 
 
-def generate_random_scores(scores_counter=6, score_range=(0,100)):
-    random.seed(42)
+def generate_random_scores(scores_counter=6, score_range=(0,100), seed=42):
+    random.seed(seed)
     return [trunc(random.random() * (score_range[1] - score_range[0]) + score_range[0]) for _ in range(scores_counter)]
 
 
@@ -14,7 +14,7 @@ scores_keys_template = ["user_score_grammar", "user_score_listenning",
         "user_score_reading_insertion", "user_score_reading_skipping", 
         "user_score_reading_phoneme", "user_score_reading_accent"]
 
-
+users_categories = [(0,25), (25, 50), (50, 75), (75, 100)]
 class User():
     def __init__(self, name:str=None, email:str=None, 
     password:str=None, age:int=None, scores : dict=None, group_id:int=-1):
@@ -32,7 +32,7 @@ class User():
             age = random.randint(20, 60)
         if scores is None:
             scores = dict(zip(scores_keys_template.copy(), 
-            generate_random_scores(scores_counter=len(scores_keys_template))))
+            generate_random_scores(scores_counter=len(scores_keys_template), score_range=random.choice(users_categories), seed=random.randint(0,100))))
 
         self.name = name
         self.email = email

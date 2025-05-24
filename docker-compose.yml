@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./server
+    container_name: fastapi_server
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./server:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/app_db
+
+  client:
+    build:
+      context: ./learn-up
+    container_name: expo_client
+    command: npx expo start
+    volumes:
+      - ./learn-up:/app
+      - /app/node_modules
+    ports:
+      - "8081:8081"
+      - "19000:19000"   # Metro bundler
+      - "19001:19001"   # Tunnel debugger
+      - "19002:19002"   # Web UI
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - FASTAPI_URL=http://backend:8000
+
+volumes:
+  db_data:
